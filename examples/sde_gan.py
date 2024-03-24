@@ -343,11 +343,11 @@ def main(
         generator_lr=2e-4,      # Learning rate often needs careful tuning to the problem.
         discriminator_lr=1e-3,  # Learning rate often needs careful tuning to the problem.
         batch_size=1024,        # Batch size.
-        steps=100,            # How many steps to train both generator and discriminator for.
+        steps=1000,            # How many steps to train both generator and discriminator for. Initially 10000, we reduced it cause colab won't let us train our gan
         init_mult1=3,           # Changing the initial parameter size can help.
         init_mult2=0.5,         #
         weight_decay=0.01,      # Weight decay.
-        swa_step_start=50,    # When to start using stochastic weight averaging.
+        swa_step_start=500,    # When to start using stochastic weight averaging. Initially 5000, we reduced it cause colab won't let us train our gan
 
         # Evaluation and plotting hyperparameters
         steps_per_print=10,                   # How often to print the loss.
@@ -435,12 +435,7 @@ def main(
 
     _, _, test_dataloader = get_data(batch_size=batch_size, device=device)
 
-    torch.save(generator.state_dict(), 'generator.pt')
-    torch.save(discriminator.state_dict(), 'discriminator.pt')
-    generat_ex = generator(ts, batch_size)
-
     plot(ts, generator, test_dataloader, num_plot_samples, plot_locs)
-    plt.savefig('fig.png') 
 
 if __name__ == '__main__':
     fire.Fire(main)
@@ -531,8 +526,4 @@ if __name__ == '__main__':
 # Right, let's wrap up this wall of text. Here, we use option (**), (a2). This is arguably the simplest option, and
 # is chosen as we'd like to keep the code readable in this example. To solve the CDEs we use the CDE solvers available
 # through torchcde: https://github.com/patrick-kidger/torchcde.
-###################
-
-###################
-#Estimation of parameters from a single path
 ###################
