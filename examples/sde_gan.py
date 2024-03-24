@@ -343,11 +343,11 @@ def main(
         generator_lr=2e-4,      # Learning rate often needs careful tuning to the problem.
         discriminator_lr=1e-3,  # Learning rate often needs careful tuning to the problem.
         batch_size=1024,        # Batch size.
-        steps=1000,            # How many steps to train both generator and discriminator for.
+        steps=100,            # How many steps to train both generator and discriminator for.
         init_mult1=3,           # Changing the initial parameter size can help.
         init_mult2=0.5,         #
         weight_decay=0.01,      # Weight decay.
-        swa_step_start=500,    # When to start using stochastic weight averaging.
+        swa_step_start=50,    # When to start using stochastic weight averaging.
 
         # Evaluation and plotting hyperparameters
         steps_per_print=10,                   # How often to print the loss.
@@ -388,6 +388,7 @@ def main(
                                                    weight_decay=weight_decay)
 
     # Train both generator and discriminator.
+
     trange = tqdm.tqdm(range(steps))
     for step in trange:
         real_samples, = next(infinite_train_dataloader)
@@ -434,8 +435,12 @@ def main(
 
     _, _, test_dataloader = get_data(batch_size=batch_size, device=device)
 
-    plot(ts, generator, test_dataloader, num_plot_samples, plot_locs)
+    torch.save(generator.state_dict(), 'generator.pt')
+    torch.save(discriminator.state_dict(), 'discriminator.pt')
+    generat_ex = generator(ts, batch_size)
 
+    plot(ts, generator, test_dataloader, num_plot_samples, plot_locs)
+    plt.savefig('fig.png') 
 
 if __name__ == '__main__':
     fire.Fire(main)
@@ -531,15 +536,3 @@ if __name__ == '__main__':
 ###################
 #Estimation of parameters from a single path
 ###################
-XX = X_1[:-1]
-YY = X_1[1:]
-beta, alpha, _, _, _ = ss.linregress(XX, YY)  # OLS
-kappa_ols = -np.log(beta) / dt
-theta_ols = alpha / (1 - beta)
-res = YY - beta * XX - alpha  # residuals
-std_resid = np.std(res, ddof=2)
-sig_ols = std_resid * np.sqrt(2 * kappa_ols / (1 - beta**2))
-
-print("OLS theta = ", theta_ols)
-print("OLS kappa = ", kappa_ols)
-print("OLS sigma = ", sig_ols)
