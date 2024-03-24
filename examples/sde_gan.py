@@ -527,3 +527,19 @@ if __name__ == '__main__':
 # is chosen as we'd like to keep the code readable in this example. To solve the CDEs we use the CDE solvers available
 # through torchcde: https://github.com/patrick-kidger/torchcde.
 ###################
+
+###################
+#Estimation of parameters from a single path
+###################
+XX = X_1[:-1]
+YY = X_1[1:]
+beta, alpha, _, _, _ = ss.linregress(XX, YY)  # OLS
+kappa_ols = -np.log(beta) / dt
+theta_ols = alpha / (1 - beta)
+res = YY - beta * XX - alpha  # residuals
+std_resid = np.std(res, ddof=2)
+sig_ols = std_resid * np.sqrt(2 * kappa_ols / (1 - beta**2))
+
+print("OLS theta = ", theta_ols)
+print("OLS kappa = ", kappa_ols)
+print("OLS sigma = ", sig_ols)
